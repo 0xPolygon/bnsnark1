@@ -5,6 +5,7 @@ package core
 #cgo LDFLAGS:-lmclbn256 -lmcl -lstdc++
 #cgo android,amd64 LDFLAGS:-L${SRCDIR}/../mclherumi/lib/linux/amd64
 #cgo linux,amd64 LDFLAGS:-L${SRCDIR}/../mclherumi/lib/linux/amd64
+#cgo darwin,arm64 LDFLAGS:-L${SRCDIR}/../mclherumi/lib/darwin/arm64
 #include <mcl/bn.h>
 */
 import "C"
