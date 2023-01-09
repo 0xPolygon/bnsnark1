@@ -98,11 +98,9 @@ func UnmarshalPublicKeyFromBigInt(b [4]*big.Int) (*PublicKey, error) {
 	return &PublicKey{p: g2}, nil
 }
 
-type PublicKeys []*PublicKey
-
 // CollectPublicKeys colects public keys from slice of private keys
-func CollectPublicKeys(keys []*PrivateKey) PublicKeys {
-	pubKeys := make(PublicKeys, len(keys))
+func CollectPublicKeys(keys []*PrivateKey) []*PublicKey {
+	pubKeys := make([]*PublicKey, len(keys))
 
 	for i, key := range keys {
 		pubKeys[i] = key.PublicKey()
@@ -112,10 +110,10 @@ func CollectPublicKeys(keys []*PrivateKey) PublicKeys {
 }
 
 // AggregatePublicKeys calculates P1 + P2 + ...
-func (pks PublicKeys) Aggregate() *PublicKey {
+func AggregatePublicKeys(pubs []*PublicKey) *PublicKey {
 	newp := new(G2)
 
-	for _, x := range pks {
+	for _, x := range pubs {
 		if x.p != nil {
 			G2Add(newp, newp, x.p)
 		}

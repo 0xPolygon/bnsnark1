@@ -38,10 +38,11 @@ func Test_AggregatedSign(t *testing.T) {
 
 	pubKeys := CollectPublicKeys(keys)
 
-	var isOk bool
-
-	signatures := Signatures{}
-	aggSignature := new(Signature)
+	var (
+		signatures   []*Signature
+		isOk         bool
+		aggSignature = &Signature{}
+	)
 
 	// test all signatures at once
 	for i := 0; i < len(keys); i++ {
@@ -60,7 +61,7 @@ func Test_AggregatedSign(t *testing.T) {
 		assert.False(t, isOk)
 
 		// verify correctness of AggregateSignature
-		aggSig := (signatures[:i+1]).Aggregate()
+		aggSig := AggregateSignatures(signatures)
 
 		isOk = aggSig.VerifyAggregated(pubKeys[:i+1], validTestMsg)
 		assert.True(t, isOk)

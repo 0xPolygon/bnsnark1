@@ -29,8 +29,8 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 }
 
 // VerifyAggregated checks the BLS signature of the message against the aggregated public keys of its signers
-func (s *Signature) VerifyAggregated(publicKeys PublicKeys, msg []byte) bool {
-	return s.Verify(publicKeys.Aggregate(), msg)
+func (s *Signature) VerifyAggregated(publicKeys []*PublicKey, msg []byte) bool {
+	return s.Verify(AggregatePublicKeys(publicKeys), msg)
 }
 
 // Aggregate adds the given signatures
@@ -83,14 +83,11 @@ func (s Signature) ToBigInt() ([2]*big.Int, error) {
 	return G1ToBigInt(s.p), nil
 }
 
-// Signatures is a slice of signatures
-type Signatures []*Signature
-
 // Aggregate sums the given array of signatures
-func (s Signatures) Aggregate() *Signature {
+func AggregateSignatures(signatures []*Signature) *Signature {
 	newp := new(G1)
 
-	for _, x := range s {
+	for _, x := range signatures {
 		if x.p != nil {
 			G1Add(newp, newp, x.p)
 		}

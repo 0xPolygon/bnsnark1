@@ -1,8 +1,10 @@
 package core
 
 /*
-#cgo CFLAGS:-DMCLBN_FP_UNIT_SIZE=4
-#cgo LDFLAGS:-lmclbn256 -lmcl
+#cgo CFLAGS:-DMCLBN_FP_UNIT_SIZE=4 -I${SRCDIR}/../mclherumi/include
+#cgo LDFLAGS:-lmclbn256 -lmcl -lstdc++
+#cgo android,amd64 LDFLAGS:-L${SRCDIR}/../mclherumi/lib/linux/amd64
+#cgo linux,amd64 LDFLAGS:-L${SRCDIR}/../mclherumi/lib/linux/amd64
 #include <mcl/bn.h>
 */
 import "C"

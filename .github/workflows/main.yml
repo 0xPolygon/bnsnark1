@@ -17,26 +17,8 @@ jobs:
         with:
           go-version: 1.18.x
 
-      - name: BuildMCL
-        run: make -j4  -C ./mcl
-
-      - name: Add to PATH
-        shell: bash
-        run: |
-          echo "$GITHUB_WORKSPACE/mcl/lib" >> $GITHUB_PATH
-        
       - name: Build
         run: go build -v ./core/...
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/mcl/lib
-          DYLD_LIBRARY_PATH: ${{ github.workspace }}/mcl/lib
-          CGO_CFLAGS: -I${{ github.workspace }}/mcl/include
-          CGO_LDFLAGS: -L${{ github.workspace }}/mcl/lib
 
       - name: Test
         run: go test -v ./core/...
-        env:
-          LD_LIBRARY_PATH: ${{ github.workspace }}/mcl/lib
-          DYLD_LIBRARY_PATH: ${{ github.workspace }}/mcl/lib
-          CGO_CFLAGS: -I${{ github.workspace }}/mcl/include
-          CGO_LDFLAGS: -L${{ github.workspace }}/mcl/lib
