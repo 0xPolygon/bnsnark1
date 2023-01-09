@@ -2,7 +2,7 @@ package core
 
 import (
 	"errors"
-	"math/big"
+	"fmt"
 )
 
 // Signature represents bls signature which is point on the curve
@@ -59,28 +59,19 @@ func (s *Signature) Marshal() ([]byte, error) {
 	return G1ToBytes(s.p), nil
 }
 
+func (s Signature) String() string {
+	return fmt.Sprintf("(%s, %s, %s)",
+		s.p.X.GetString(16), s.p.Y.GetString(16), s.p.Z.GetString(16))
+}
+
 // UnmarshalSignature reads the signature from the given byte array
 func UnmarshalSignature(raw []byte) (*Signature, error) {
-	if len(raw) == 0 {
-		return nil, errors.New("cannot unmarshal signature from empty slice")
-	}
-
-	bigInts, err := BytesToBigInt2(raw)
-	if err != nil {
-		return nil, err
-	}
-
-	g1, err := G1FromBigInt(bigInts)
+	g1, err := G1FromBytes(raw)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Signature{p: g1}, nil
-}
-
-// ToBigInt marshalls signature (which is point) to 2 big ints - one for each coordinate
-func (s Signature) ToBigInt() ([2]*big.Int, error) {
-	return G1ToBigInt(s.p), nil
 }
 
 // Aggregate sums the given array of signatures

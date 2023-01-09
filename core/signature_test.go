@@ -21,13 +21,26 @@ func Test_VerifySignature(t *testing.T) {
 	blsKey, err := GenerateBlsKey()
 	require.NoError(t, err)
 
+	blsKey2, err := GenerateBlsKey()
+	require.NoError(t, err)
+
 	publicKey := blsKey.PublicKey()
 
 	signature, err := blsKey.Sign(validTestMsg)
 	require.NoError(t, err)
 
-	assert.True(t, signature.Verify(publicKey, validTestMsg))
-	assert.False(t, signature.Verify(publicKey, invalidTestMsg))
+	oPk, err := UnmarshalPublicKey(publicKey.Marshal())
+	require.NoError(t, err)
+
+	sigBytes, err := signature.Marshal()
+	require.NoError(t, err)
+
+	oSig, err := UnmarshalSignature(sigBytes)
+	require.NoError(t, err)
+
+	assert.True(t, oSig.Verify(oPk, validTestMsg))
+	assert.False(t, oSig.Verify(oPk, invalidTestMsg))
+	assert.False(t, oSig.Verify(blsKey2.PublicKey(), validTestMsg))
 }
 
 func Test_AggregatedSignatureSimple(t *testing.T) {
@@ -119,21 +132,6 @@ func Test_AggregatedSignature(t *testing.T) {
 
 	verifed = aggSignature.Verify(aggPubs, invalidTestMsg)
 	assert.False(t, verifed)
-}
-
-func TestSignature_BigInt(t *testing.T) {
-	t.Parallel()
-
-	validTestMsg := testGenRandomBytes(t, messageSize)
-
-	bls1, err := GenerateBlsKey()
-	require.NoError(t, err)
-
-	sig1, err := bls1.Sign(validTestMsg)
-	assert.NoError(t, err)
-
-	_, err = sig1.ToBigInt()
-	require.NoError(t, err)
 }
 
 func TestSignature_Unmarshal(t *testing.T) {

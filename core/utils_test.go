@@ -72,9 +72,8 @@ func Test_AggregatedSign(t *testing.T) {
 }
 
 func Test_MarshalMessageToBigInt(t *testing.T) {
-	bigInts, err := MarshalMessageToBigInt([]byte("test test tes"))
+	bytes, err := MarshalMessage([]byte("test test tes"))
 
 	require.NoError(t, err)
-	assert.NotNil(t, bigInts[0])
-	assert.NotNil(t, bigInts[1])
+	assert.Len(t, bytes, 64)
 }

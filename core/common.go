@@ -65,6 +65,14 @@ func GetCoef() []uint64 {
 	return qCoef
 }
 
+func GetR1() Fp {
+	return r1
+}
+
+func GetR2() Fp {
+	return r2
+}
+
 func G1Zero(g1 *G1) *G1 {
 	g1.X = newFp(0, 0, 0, 0)
 	g1.Z = newFp(0, 0, 0, 0)

@@ -3,7 +3,6 @@ package core
 import (
 	"crypto/sha256"
 	"errors"
-	"math/big"
 )
 
 // CreateRandomBlsKeys creates an slice of random private keys
@@ -22,15 +21,14 @@ func CreateRandomBlsKeys(total int) ([]*PrivateKey, error) {
 	return blsKeys, nil
 }
 
-// MarshalMessageToBigInt marshalls message into two big ints
-// first we must convert message bytes to point and than for each coordinate we create big int
-func MarshalMessageToBigInt(message []byte) ([2]*big.Int, error) {
+// MarshalMessage marshalls message into byte slice
+func MarshalMessage(message []byte) ([]byte, error) {
 	g1, err := HashToG1(message)
 	if err != nil {
-		return [2]*big.Int{}, err
+		return nil, err
 	}
 
-	return G1ToBigInt(g1), nil
+	return G1ToBytes(g1), nil
 }
 
 // HashToG103 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
@@ -138,12 +136,33 @@ func expandMsgSHA256XMD(msg []byte, domain []byte, outLen int) ([]byte, error) {
 	return out[:outLen], nil
 }
 
-func fromBytes(in []byte) (*Fp, error) {
-	if len(in) != 32 {
+func fpFromBytes(in []byte) (*Fp, error) {
+	const size = 32
+
+	if len(in) != size {
 		return nil, errors.New("input string should be equal 32 bytes")
 	}
 
-	fe := BytesToFp(in)
+	l := len(in)
+	if l >= size {
+		l = size
+	}
+
+	padded := make([]byte, size)
+
+	copy(padded[size-l:], in[:])
+
+	component := [4]uint64{}
+
+	for i := 0; i < 4; i++ {
+		a := size - i*8
+		component[i] = uint64(padded[a-1]) | uint64(padded[a-2])<<8 |
+			uint64(padded[a-3])<<16 | uint64(padded[a-4])<<24 |
+			uint64(padded[a-5])<<32 | uint64(padded[a-6])<<40 |
+			uint64(padded[a-7])<<48 | uint64(padded[a-8])<<56
+	}
+
+	fe := newFp(component[0], component[1], component[2], component[3])
 
 	FpMul(&fe, &fe, &r2)
 
@@ -160,12 +179,12 @@ func from48Bytes(in []byte) (*Fp, error) {
 	a1 := make([]byte, 32)
 	copy(a1[8:32], in[24:])
 
-	e0, err := fromBytes(a0)
+	e0, err := fpFromBytes(a0)
 	if err != nil {
 		return nil, err
 	}
 
-	e1, err := fromBytes(a1)
+	e1, err := fpFromBytes(a1)
 	if err != nil {
 		return nil, err
 	}
