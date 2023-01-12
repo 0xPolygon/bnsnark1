@@ -10,6 +10,10 @@ type PublicKey struct {
 	p *G2
 }
 
+func (p *PublicKey) G2() *G2 {
+	return p.p
+}
+
 // Aggregate aggregates current key with key passed as a parameter
 func (p *PublicKey) Aggregate(next *PublicKey) *PublicKey {
 	newp := new(G2)
