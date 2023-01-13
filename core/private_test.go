@@ -1,6 +1,7 @@
 package core
 
 import (
+	"github.com/0xPolygon/bnsnark1/mcl"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,8 +25,8 @@ func Test_PrivateMarshal(t *testing.T) {
 }
 
 func Test_PrivateMarshal1(t *testing.T) {
-	messagePoint := new(G1)
-	g1 := new(G1)
+	messagePoint := new(mcl.G1)
+	g1 := new(mcl.G1)
 
 	err := messagePoint.HashAndMapTo([]byte("ahsfjhsdjfhsdjf"))
 	require.NoError(t, err)

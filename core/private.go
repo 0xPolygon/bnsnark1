@@ -2,6 +2,7 @@ package core
 
 import (
 	"errors"
+	"github.com/0xPolygon/bnsnark1/mcl"
 )
 
 var (
@@ -10,14 +11,14 @@ var (
 )
 
 type PrivateKey struct {
-	p *Fr
+	p *mcl.Fr
 }
 
 // PublicKey returns the public key from the PrivateKey
 func (p *PrivateKey) PublicKey() *PublicKey {
-	public := new(G2)
+	public := new(mcl.G2)
 
-	G2Mul(public, ellipticCurveG2, p.p)
+	mcl.G2Mul(public, ellipticCurveG2, p.p)
 
 	return &PublicKey{p: public}
 }
@@ -29,9 +30,9 @@ func (p *PrivateKey) Sign(message []byte) (*Signature, error) {
 		return nil, err
 	}
 
-	g1 := new(G1)
+	g1 := new(mcl.G1)
 
-	G1Mul(g1, messagePoint, p.p)
+	mcl.G1Mul(g1, messagePoint, p.p)
 
 	return &Signature{p: g1}, nil
 }
@@ -47,7 +48,7 @@ func (p *PrivateKey) MarshalJSON() ([]byte, error) {
 
 // UnmarshalPrivateKey reads the private key from the given byte array
 func UnmarshalPrivateKey(data []byte) (*PrivateKey, error) {
-	p := new(Fr)
+	p := new(mcl.Fr)
 
 	if err := p.Deserialize(data); err != nil {
 		return nil, err
@@ -58,7 +59,7 @@ func UnmarshalPrivateKey(data []byte) (*PrivateKey, error) {
 
 // GenerateBlsKey creates a random private and its corresponding public keys
 func GenerateBlsKey() (*PrivateKey, error) {
-	p := new(Fr)
+	p := new(mcl.Fr)
 
 	if !p.SetByCSPRNG() {
 		return nil, errPrivateKeyGenerator

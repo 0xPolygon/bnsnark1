@@ -2,10 +2,11 @@ package core
 
 import (
 	"fmt"
+	"github.com/0xPolygon/bnsnark1/mcl"
 )
 
-func G1ToBytes(p *G1) []byte {
-	G1Normalize(p, p)
+func G1ToBytes(p *mcl.G1) []byte {
+	mcl.G1Normalize(p, p)
 
 	a := padLeftOrTrim(p.X.Serialize(), 32)
 	b := padLeftOrTrim(p.Y.Serialize(), 32)
@@ -17,8 +18,8 @@ func G1ToBytes(p *G1) []byte {
 	return res
 }
 
-func G2ToBytes(p *G2) []byte {
-	G2Normalize(p, p)
+func G2ToBytes(p *mcl.G2) []byte {
+	mcl.G2Normalize(p, p)
 
 	a := padLeftOrTrim(p.X.D[0].Serialize(), 32)
 	b := padLeftOrTrim(p.X.D[1].Serialize(), 32)
@@ -34,15 +35,15 @@ func G2ToBytes(p *G2) []byte {
 	return res
 }
 
-func G1FromBytes(raw []byte) (*G1, error) {
+func G1FromBytes(raw []byte) (*mcl.G1, error) {
 	if len(raw) != 64 {
 		return nil, fmt.Errorf("expect length 64 but got %d", len(raw))
 	}
 
-	g1 := new(G1)
+	g1 := new(mcl.G1)
 	offset := 0
 
-	for _, x := range []*Fp{&g1.X, &g1.Y} {
+	for _, x := range []*mcl.Fp{&g1.X, &g1.Y} {
 		if err := x.SetLittleEndian(raw[offset : offset+32]); err != nil {
 			return nil, err
 		}
@@ -55,15 +56,15 @@ func G1FromBytes(raw []byte) (*G1, error) {
 	return g1, nil
 }
 
-func G2FromBytes(raw []byte) (*G2, error) {
+func G2FromBytes(raw []byte) (*mcl.G2, error) {
 	if len(raw) != 128 {
 		return nil, fmt.Errorf("expect length 128 but got %d", len(raw))
 	}
 
-	g2 := new(G2)
+	g2 := new(mcl.G2)
 	offset := 0
 
-	for _, x := range []*Fp{&g2.X.D[0], &g2.X.D[1], &g2.Y.D[0], &g2.Y.D[1]} {
+	for _, x := range []*mcl.Fp{&g2.X.D[0], &g2.X.D[1], &g2.Y.D[0], &g2.Y.D[1]} {
 		if err := x.SetLittleEndian(raw[offset : offset+32]); err != nil {
 			return nil, err
 		}

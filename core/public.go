@@ -3,29 +3,30 @@ package core
 import (
 	"encoding/json"
 	"fmt"
+	"github.com/0xPolygon/bnsnark1/mcl"
 )
 
 // PublicKey represents bls public key
 type PublicKey struct {
-	p *G2
+	p *mcl.G2
 }
 
-func (p *PublicKey) G2() *G2 {
+func (p *PublicKey) G2() *mcl.G2 {
 	return p.p
 }
 
 // Aggregate aggregates current key with key passed as a parameter
 func (p *PublicKey) Aggregate(next *PublicKey) *PublicKey {
-	newp := new(G2)
+	newp := new(mcl.G2)
 
 	if p.p != nil {
 		if next.p != nil {
-			G2Add(newp, p.p, next.p)
+			mcl.G2Add(newp, p.p, next.p)
 		} else {
-			G2Add(newp, newp, p.p)
+			mcl.G2Add(newp, newp, p.p)
 		}
 	} else if next.p != nil {
-		G2Add(newp, newp, next.p)
+		mcl.G2Add(newp, newp, next.p)
 	}
 
 	return &PublicKey{p: newp}
@@ -92,11 +93,11 @@ func CollectPublicKeys(keys []*PrivateKey) []*PublicKey {
 
 // AggregatePublicKeys calculates P1 + P2 + ...
 func AggregatePublicKeys(pubs []*PublicKey) *PublicKey {
-	newp := new(G2)
+	newp := new(mcl.G2)
 
 	for _, x := range pubs {
 		if x.p != nil {
-			G2Add(newp, newp, x.p)
+			mcl.G2Add(newp, newp, x.p)
 		}
 	}
 

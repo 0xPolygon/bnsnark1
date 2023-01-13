@@ -3,11 +3,12 @@ package core
 import (
 	"errors"
 	"fmt"
+	"github.com/0xPolygon/bnsnark1/mcl"
 )
 
 // Signature represents bls signature which is point on the curve
 type Signature struct {
-	p *G1
+	p *mcl.G1
 }
 
 // Verify checks the BLS signature of the message against the public key of its signer
@@ -17,13 +18,13 @@ func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
 		return false
 	}
 
-	e1, e2 := new(GT), new(GT)
+	e1, e2 := new(mcl.GT), new(mcl.GT)
 
-	G1Neg(messagePoint, messagePoint)
-	PrecomputedMillerLoop(e1, s.p, GetCoef())
-	MillerLoop(e2, messagePoint, publicKey.p)
-	GTMul(e1, e1, e2)
-	FinalExp(e1, e1)
+	mcl.G1Neg(messagePoint, messagePoint)
+	mcl.PrecomputedMillerLoop(e1, s.p, GetCoef())
+	mcl.MillerLoop(e2, messagePoint, publicKey.p)
+	mcl.GTMul(e1, e1, e2)
+	mcl.FinalExp(e1, e1)
 
 	return e1.IsOne()
 }
@@ -35,16 +36,16 @@ func (s *Signature) VerifyAggregated(publicKeys []*PublicKey, msg []byte) bool {
 
 // Aggregate adds the given signatures
 func (s *Signature) Aggregate(next *Signature) *Signature {
-	newp := new(G1)
+	newp := new(mcl.G1)
 
 	if s.p != nil {
 		if next.p != nil {
-			G1Add(newp, s.p, next.p)
+			mcl.G1Add(newp, s.p, next.p)
 		} else {
-			G1Add(newp, newp, s.p)
+			mcl.G1Add(newp, newp, s.p)
 		}
 	} else if next.p != nil {
-		G1Add(newp, newp, next.p)
+		mcl.G1Add(newp, newp, next.p)
 	}
 
 	return &Signature{p: newp}
@@ -76,11 +77,11 @@ func UnmarshalSignature(raw []byte) (*Signature, error) {
 
 // Aggregate sums the given array of signatures
 func AggregateSignatures(signatures []*Signature) *Signature {
-	newp := new(G1)
+	newp := new(mcl.G1)
 
 	for _, x := range signatures {
 		if x.p != nil {
-			G1Add(newp, newp, x.p)
+			mcl.G1Add(newp, newp, x.p)
 		}
 	}
 

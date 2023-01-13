@@ -1,4 +1,4 @@
-package core
+package mcl
 
 /*
 #cgo CFLAGS:-DMCLBN_FP_UNIT_SIZE=4 -I${SRCDIR}/../mclherumi/include
@@ -352,7 +352,7 @@ type Fp struct {
 	v C.mclBnFp
 }
 
-func newFp(a, b, c, d uint64) Fp {
+func NewFp(a, b, c, d uint64) Fp {
 	fp := Fp{
 		v: C.mclBnFp{
 			d: [4]C.uint64_t{

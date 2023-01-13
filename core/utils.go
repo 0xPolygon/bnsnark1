@@ -3,6 +3,7 @@ package core
 import (
 	"crypto/sha256"
 	"errors"
+	"github.com/0xPolygon/bnsnark1/mcl"
 )
 
 // CreateRandomBlsKeys creates an slice of random private keys
@@ -32,8 +33,8 @@ func MarshalMessage(message []byte) ([]byte, error) {
 }
 
 // HashToG103 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
-func HashToG103(message []byte) (*G1, error) {
-	g1 := new(G1)
+func HashToG103(message []byte) (*mcl.G1, error) {
+	g1 := new(mcl.G1)
 	if err := g1.HashAndMapTo(message); err != nil {
 		return nil, err
 	}
@@ -42,36 +43,36 @@ func HashToG103(message []byte) (*G1, error) {
 }
 
 // HashToG107 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-07
-func HashToG107(message []byte) (*G1, error) {
+func HashToG107(message []byte) (*mcl.G1, error) {
 	hashRes, err := hashToFpXMDSHA256(message, GetDomain(), 2)
 	if err != nil {
 		return nil, err
 	}
 
-	p0, p1 := new(G1), new(G1)
+	p0, p1 := new(mcl.G1), new(mcl.G1)
 	u0, u1 := hashRes[0], hashRes[1]
 
-	if err := MapToG1(p0, u0); err != nil {
+	if err := mcl.MapToG1(p0, u0); err != nil {
 		return nil, err
 	}
 
-	if err := MapToG1(p1, u1); err != nil {
+	if err := mcl.MapToG1(p1, u1); err != nil {
 		return nil, err
 	}
 
-	G1Add(p0, p0, p1)
-	G1Normalize(p0, p0)
+	mcl.G1Add(p0, p0, p1)
+	mcl.G1Normalize(p0, p0)
 
 	return p0, nil
 }
 
-func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*Fp, error) {
+func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*mcl.Fp, error) {
 	randBytes, err := expandMsgSHA256XMD(msg, domain, count*48)
 	if err != nil {
 		return nil, err
 	}
 
-	els := make([]*Fp, count)
+	els := make([]*mcl.Fp, count)
 
 	for i := 0; i < count; i++ {
 		els[i], err = from48Bytes(randBytes[i*48 : (i+1)*48])
@@ -136,7 +137,7 @@ func expandMsgSHA256XMD(msg []byte, domain []byte, outLen int) ([]byte, error) {
 	return out[:outLen], nil
 }
 
-func fpFromBytes(in []byte) (*Fp, error) {
+func fpFromBytes(in []byte) (*mcl.Fp, error) {
 	const size = 32
 
 	if len(in) != size {
@@ -162,14 +163,14 @@ func fpFromBytes(in []byte) (*Fp, error) {
 			uint64(padded[a-7])<<48 | uint64(padded[a-8])<<56
 	}
 
-	fe := newFp(component[0], component[1], component[2], component[3])
+	fe := mcl.NewFp(component[0], component[1], component[2], component[3])
 
-	FpMul(&fe, &fe, &r2)
+	mcl.FpMul(&fe, &fe, &r2)
 
 	return &fe, nil
 }
 
-func from48Bytes(in []byte) (*Fp, error) {
+func from48Bytes(in []byte) (*mcl.Fp, error) {
 	if len(in) != 48 {
 		return nil, errors.New("input string should be equal 48 bytes")
 	}
@@ -190,13 +191,13 @@ func from48Bytes(in []byte) (*Fp, error) {
 	}
 
 	// F = 2 ^ 192 * R
-	F := newFp(0xd9e291c2cdd22cd6,
+	F := mcl.NewFp(0xd9e291c2cdd22cd6,
 		0xc722ccf2a40f0271,
 		0xa49e35d611a2ac87,
 		0x2e1043978c993ec8)
 
-	FpMul(e0, e0, &F)
-	FpAdd(e1, e1, e0)
+	mcl.FpMul(e0, e0, &F)
+	mcl.FpAdd(e1, e1, e0)
 
 	return e1, nil
 }
