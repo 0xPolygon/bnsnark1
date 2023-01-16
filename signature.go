@@ -1,21 +1,22 @@
-package core
+package bnsnark1
 
 import (
 	"errors"
+	"github.com/0xPolygon/bnsnark1/types"
 )
 
 // Signature represents bls signature which is point on the curve
 type Signature struct {
-	p G1
+	p types.G1
 }
 
 // Verify checks the BLS signature of the message against the public key of its signer
 func (s *Signature) Verify(publicKey *PublicKey, message []byte) bool {
-	messagePoint, err := pp.HashToG1(message)
+	messagePoint, err := bls.HashToG1(message)
 	if err != nil {
 		return false
 	}
-	return pp.VerifyOpt(publicKey.p, messagePoint, s.p)
+	return bls.VerifyOpt(publicKey.p, messagePoint, s.p)
 }
 
 // VerifyAggregated checks the BLS signature of the message against the aggregated public keys of its signers
@@ -25,10 +26,10 @@ func (s *Signature) VerifyAggregated(publicKeys []*PublicKey, msg []byte) bool {
 
 // Aggregate adds the given signatures
 func (s *Signature) Aggregate(next *Signature) *Signature {
-	newp := pp.NewG1()
+	newp := bls.NewG1()
 	if s.p != nil {
 		if next.p != nil {
-			newp = newp.Add(next.p)
+			newp = s.p.Add(next.p)
 		} else {
 			newp = newp.Add(s.p)
 		}
@@ -55,7 +56,7 @@ func (s *Signature) String() string {
 
 // UnmarshalSignature reads the signature from the given byte array
 func UnmarshalSignature(raw []byte) (*Signature, error) {
-	sig := pp.NewG1()
+	sig := bls.NewG1()
 	err := sig.Deserialize(raw)
 	if err != nil {
 		return nil, err
@@ -66,7 +67,7 @@ func UnmarshalSignature(raw []byte) (*Signature, error) {
 
 // Aggregate sums the given array of signatures
 func AggregateSignatures(signatures []*Signature) *Signature {
-	newp := pp.NewG1()
+	newp := bls.NewG1()
 	for _, x := range signatures {
 		if x.p != nil {
 			newp = newp.Add(x.p)

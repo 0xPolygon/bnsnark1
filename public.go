@@ -1,21 +1,22 @@
-package core
+package bnsnark1
 
 import (
 	"encoding/json"
+	"github.com/0xPolygon/bnsnark1/types"
 )
 
 // PublicKey represents bls public key
 type PublicKey struct {
-	p G2
+	p types.G2
 }
 
-func (p *PublicKey) G2() G2 {
+func (p *PublicKey) G2() types.G2 {
 	return p.p
 }
 
 // Aggregate aggregates current key with key passed as a parameter
 func (p *PublicKey) Aggregate(next *PublicKey) *PublicKey {
-	newp := pp.NewG2()
+	newp := bls.NewG2()
 	if p.p != nil {
 		if next.p != nil {
 			newp = p.p.Add(next.p)
@@ -37,7 +38,7 @@ func (p *PublicKey) Marshal() []byte {
 	return p.p.Serialize()
 }
 
-// MarshalJSON implements the json.Marshaler interface.
+// MarshalJSON implements the json.Marshaler types.
 func (p *PublicKey) MarshalJSON() ([]byte, error) {
 	return json.Marshal(p.Marshal())
 }
@@ -50,7 +51,7 @@ func (p *PublicKey) String() string {
 	//	p.p.Z.D[0].GetString(16), p.p.Z.D[1].GetString(16))
 }
 
-// UnmarshalJSON implements the json.Marshaler interface.
+// UnmarshalJSON implements the json.Marshaler types.
 func (p *PublicKey) UnmarshalJSON(raw []byte) error {
 	var jsonBytes []byte
 	var err error
@@ -59,7 +60,7 @@ func (p *PublicKey) UnmarshalJSON(raw []byte) error {
 		return err
 	}
 
-	p.p = pp.NewG2()
+	p.p = bls.NewG2()
 	if err = p.p.Deserialize(jsonBytes); err != nil {
 		return err
 	}
@@ -69,7 +70,7 @@ func (p *PublicKey) UnmarshalJSON(raw []byte) error {
 
 // UnmarshalPublicKey reads the public key from the given byte array
 func UnmarshalPublicKey(raw []byte) (*PublicKey, error) {
-	g2 := pp.NewG2()
+	g2 := bls.NewG2()
 	err := g2.Deserialize(raw)
 	if err != nil {
 		return nil, err
@@ -90,7 +91,7 @@ func CollectPublicKeys(keys []*PrivateKey) []*PublicKey {
 
 // AggregatePublicKeys calculates P1 + P2 + ...
 func AggregatePublicKeys(pubs []*PublicKey) *PublicKey {
-	newp := pp.NewG2()
+	newp := bls.NewG2()
 	for _, x := range pubs {
 		if x.p != nil {
 			newp = newp.Add(x.p)

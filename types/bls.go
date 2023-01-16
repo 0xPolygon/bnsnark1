@@ -1,10 +1,4 @@
-package core
-
-var pp BLS
-
-func SetBLS(ppInit BLS) {
-	pp = ppInit
-}
+package types
 
 type BLS interface {
 	NewSK() SK

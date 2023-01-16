@@ -3,7 +3,8 @@ package mcl
 import (
 	"errors"
 	"fmt"
-	"github.com/0xPolygon/bnsnark1/core"
+	"github.com/0xPolygon/bnsnark1/common"
+	"github.com/0xPolygon/bnsnark1/types"
 )
 
 func init() {
@@ -18,39 +19,39 @@ func init() {
 	qCoef = PrecomputeG2(ellipticCurveG2)
 }
 
-var _ core.G1 = &G1{}
+var _ types.G1 = &G1{}
 
-func (x *G1) Add(g1 core.G1) core.G1 {
+func (x *G1) Add(g1 types.G1) types.G1 {
 	result := new(G1)
 	G1Add(result, x, g1.(*G1))
 	return result
 }
 
-func (x *G1) Mul(sk core.SK) core.G1 {
+func (x *G1) Mul(sk types.SK) types.G1 {
 	result := new(G1)
 	G1Mul(result, x, sk.(*Fr))
 	return result
 }
 
-var _ core.G2 = &G2{}
+var _ types.G2 = &G2{}
 
-func (x *G2) Add(g2 core.G2) core.G2 {
+func (x *G2) Add(g2 types.G2) types.G2 {
 	result := new(G2)
 	G2Add(result, x, g2.(*G2))
 	return result
 }
 
-func (x *G2) Mul(sk core.SK) core.G2 {
+func (x *G2) Mul(sk types.SK) types.G2 {
 	public := new(G2)
 	G2Mul(public, ellipticCurveG2, sk.(*Fr))
 	return public
 }
 
-var _ core.SK = &Fr{}
+var _ types.SK = &Fr{}
 
 type BLSImpl struct{}
 
-func (B *BLSImpl) VerifyOpt(pk core.G2, mp, sig core.G1) bool {
+func (B *BLSImpl) VerifyOpt(pk types.G2, mp, sig types.G1) bool {
 	e1, e2 := new(GT), new(GT)
 	G1Neg(mp.(*G1), mp.(*G1))
 	PrecomputedMillerLoop(e1, sig.(*G1), GetCoef())
@@ -60,31 +61,31 @@ func (B *BLSImpl) VerifyOpt(pk core.G2, mp, sig core.G1) bool {
 	return e1.IsOne()
 }
 
-func (B *BLSImpl) NewSK() core.SK {
+func (B *BLSImpl) NewSK() types.SK {
 	return new(Fr)
 }
 
-func (B *BLSImpl) NewG1() core.G1 {
+func (B *BLSImpl) NewG1() types.G1 {
 	return new(G1)
 }
 
-func (B *BLSImpl) NewG2() core.G2 {
+func (B *BLSImpl) NewG2() types.G2 {
 	return new(G2)
 }
 
-func (B *BLSImpl) RandomSK() core.SK {
+func (B *BLSImpl) RandomSK() types.SK {
 	p := new(Fr)
 	if !p.SetByCSPRNG() {
-		panic(core.ErrPrivateKeyGenerator)
+		panic(common.ErrPrivateKeyGenerator)
 	}
 	return p
 }
 
-func (B *BLSImpl) HashToG1(bytes []byte) (core.G1, error) {
+func (B *BLSImpl) HashToG1(bytes []byte) (types.G1, error) {
 	return HashToG107(bytes)
 }
 
-var _ core.BLS = &BLSImpl{}
+var _ types.BLS = &BLSImpl{}
 
 //// HashToG103 converts message to G1 point https://datatracker.ietf.org/doc/html/draft-irtf-cfrg-hash-to-curve-03
 //func HashToG103(message []byte) (*G1, error) {
@@ -121,7 +122,7 @@ func HashToG107(message []byte) (*G1, error) {
 }
 
 func hashToFpXMDSHA256(msg []byte, domain []byte, count int) ([]*Fp, error) {
-	randBytes, err := core.ExpandMsgSHA256XMD(msg, domain, count*48)
+	randBytes, err := common.ExpandMsgSHA256XMD(msg, domain, count*48)
 	if err != nil {
 		return nil, err
 	}
