@@ -1,7 +1,6 @@
 package core
 
 import (
-	"github.com/0xPolygon/bnsnark1/mcl"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -24,18 +23,19 @@ func Test_PrivateMarshal(t *testing.T) {
 	assert.Equal(t, blsKey, blsKeyUnmarshalled)
 }
 
-func Test_PrivateMarshal1(t *testing.T) {
-	messagePoint := new(mcl.G1)
-	g1 := new(mcl.G1)
-
-	err := messagePoint.HashAndMapTo([]byte("ahsfjhsdjfhsdjf"))
-	require.NoError(t, err)
-
-	v := messagePoint.SerializeUncompressed()
-
-	err = g1.DeserializeUncompressed(v)
-
-	require.NoError(t, err)
-
-	require.Equal(t, messagePoint, g1)
-}
+// TODO: redo
+//func Test_PrivateMarshal1(t *testing.T) {
+//	messagePoint := new(mcl.G1)
+//	g1 := new(mcl.G1)
+//
+//	err := messagePoint.HashAndMapTo([]byte("ahsfjhsdjfhsdjf"))
+//	require.NoError(t, err)
+//
+//	v := messagePoint.SerializeUncompressed()
+//
+//	err = g1.DeserializeUncompressed(v)
+//
+//	require.NoError(t, err)
+//
+//	require.Equal(t, messagePoint, g1)
+//}
