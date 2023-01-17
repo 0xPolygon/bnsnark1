@@ -11,7 +11,7 @@ type PrivateKey struct {
 
 // PublicKey returns the public key from the PrivateKey
 func (p *PrivateKey) PublicKey() *PublicKey {
-	return &PublicKey{bls.NewG2().Mul(p.p)}
+	return &PublicKey{bls.G2Generator().Mul(p.p)}
 }
 
 // Sign generates a signature of the given message

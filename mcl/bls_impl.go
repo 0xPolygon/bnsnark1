@@ -55,6 +55,12 @@ var _ types.SK = &Fr{}
 
 type BLSImpl struct{}
 
+func (B *BLSImpl) G2Generator() types.G2 {
+	gen := new(G2)
+	gen = ellipticCurveG2 // copy to make sure this doesn't get stepped on
+	return gen
+}
+
 func (B *BLSImpl) VerifyOpt(pk types.G2, mp, sig types.G1) bool {
 	e1, e2 := new(GT), new(GT)
 	G1Neg(mp.(*G1), mp.(*G1))

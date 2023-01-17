@@ -7,6 +7,8 @@ type BLS interface {
 
 	RandomSK() SK
 
+	G2Generator() G2
+
 	HashToG1([]byte) (G1, error)
 
 	VerifyOpt(pk G2, mp, sig G1) bool
