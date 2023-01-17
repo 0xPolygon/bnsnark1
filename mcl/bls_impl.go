@@ -47,6 +47,10 @@ func (x *G2) Mul(sk types.SK) types.G2 {
 	return public
 }
 
+func (x *G2) Marshall() []byte {
+	return G2ToBytes(x)
+}
+
 var _ types.SK = &Fr{}
 
 type BLSImpl struct{}

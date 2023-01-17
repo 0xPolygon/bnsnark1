@@ -13,6 +13,27 @@ const (
 	participantsNumber = 64
 )
 
+func Test_BasicSignature(t *testing.T) {
+
+	validTestMsg, invalidTestMsg := testGenRandomBytes(t, messageSize), testGenRandomBytes(t, messageSize)
+
+	blsKey, err := GenerateBlsKey()
+	require.NoError(t, err)
+
+	blsKey2, err := GenerateBlsKey()
+	require.NoError(t, err)
+
+	publicKey := blsKey.PublicKey()
+
+	signature, err := blsKey.Sign(validTestMsg)
+	require.NoError(t, err)
+
+	assert.True(t, signature.Verify(publicKey, validTestMsg))
+	assert.False(t, signature.Verify(publicKey, invalidTestMsg))
+	assert.False(t, signature.Verify(blsKey2.PublicKey(), validTestMsg))
+
+}
+
 func Test_VerifySignature(t *testing.T) {
 	t.Parallel()
 

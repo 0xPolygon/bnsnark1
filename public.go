@@ -35,7 +35,7 @@ func (p *PublicKey) Marshal() []byte {
 	if p.p == nil {
 		return nil
 	}
-	return p.p.Serialize()
+	return p.p.Marshall()
 }
 
 // MarshalJSON implements the json.Marshaler types.

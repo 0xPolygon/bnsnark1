@@ -29,4 +29,6 @@ type G2 interface {
 	Mul(SK) G2
 	Serialize() []byte
 	Deserialize([]byte) error
+
+	Marshall() []byte // TODO: how / why different from Serialize?
 }
